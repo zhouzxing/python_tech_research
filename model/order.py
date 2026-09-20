@@ -1,8 +1,6 @@
 from pydantic import BaseModel
-
 from sqlalchemy.orm import declarative_base,sessionmaker
 from sqlalchemy import Column, Integer,String,DATETIME,create_engine
-
 from datetime import datetime
 
 db_url = "mysql+pymysql://geeker:geeker@127.0.0.1:3306/fastapi_tutor?charset=utf8mb4"
@@ -15,22 +13,6 @@ def get_session():
                            , autocommit=False
                            )
     yield Session()
-
-# 定义创建订单的请求体模型
-class OrderRequest(BaseModel):
-    id:int|None = None
-    title:str|None = None
-    userid:int|None =None
-
-class OrderResponse(BaseModel):
-    id:int|None = None
-    title:str|None = None
-    userid:int|None =None
-    create_date:datetime|None = datetime.now()
-    update_date:datetime|None = datetime.now()
-    status_code:str|None = 200
-    detail:str|None = 'succeed!'
-
 
 Base = declarative_base()  # 执行函数，返回一个基类
 class Order(Base):   # python里的表名字
@@ -53,4 +35,32 @@ class Order(Base):   # python里的表名字
                          , default=datetime.now  # 首次创建的时间跟更新时间一致
                          , onupdate=datetime.now
                          )
+
+# 定义创建订单的请求体模型
+class OrderRequest(BaseModel):
+    id:int|None = None
+    title:str|None = None
+    userid:int|None =None
+
+# todo 序列化问题： Order - Base 无法直接序列
+class OrderSchema(BaseModel):
+    id:int
+    title:str
+    userid:int
+    create_date:datetime
+    update_date:datetime
+
+class OrderResponse(BaseModel):
+    # id:int|None = None
+    # title:str|None = None
+    # userid:int|None =None
+    # create_date:datetime|None = datetime.now()
+    # update_date:datetime|None = datetime.now()
+    status_code:str = 200
+    detail:str = 'succeed!'
+    total:int = 1
+    # data:str|dict|list[OrderSchema] # 响应数据
+    data:str|dict|list[object] # 响应数据
+
+
 Order.__table__.create(engine,checkfirst = True)

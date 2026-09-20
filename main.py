@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 from router.features import form, method, file, validation, mimetype, path_query_variables, json
 
-from router.dbopt import mysql,order
+from router.dbopt import mysql,order_route
 
 from router.workhome import wk_0915,wk_0916,wk_0917
 
@@ -27,7 +27,7 @@ app.include_router(json.route)
 
 
 app.include_router(mysql.route)
-app.include_router(order.route)
+app.include_router(order_route.route)
 
 # homeworks...
 app.include_router(wk_0915.route)

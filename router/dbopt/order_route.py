@@ -7,25 +7,34 @@ from pydantic import BaseModel
 
 from model.order import OrderRequest,Order,get_session,OrderResponse
 
+from dao.order_dao import get_order
+
 route = APIRouter(prefix="/order",tags=["orders"])
 
 # 模糊查询
-@route.get('/',response_model=list[OrderResponse])
+@route.get('/',response_model=OrderResponse)
+def orders(id:int=None, user_id:int=None, title:str=None,session=Depends(get_session)):
+    return get_order(id,user_id,title,session)
+
+# todo 请求响应模型序列化Order类问题
+@route.get('/no_response_model')
 def orders(id:int=None, user_id:int=None, title:str=None,session=Depends(get_session)):
     q = session.query(Order)
-    if id: q = q.filter( Order.id == id )
-    if user_id: q = q.filter( Order.userid == userid )
-    if title: q = q.where(Order.title.like('%'+title+'%'))
-    r = q.all()
-    session.close()
-    return r
+    if id: q = q.filter(Order.id == id)
+    if user_id: q = q.filter(Order.userid == user_id)
+    if title: q = q.where(Order.title.like('%' + title + '%'))
+    res = q.all()
+    return res
+
+
 
 @route.get('/{id}',response_model=OrderResponse)
-def orders(id:int):
-    session = Session()
-    r = session.query(Order).filter( Order.id == id ).all()
+def orders(id:int,session=Depends(get_session)):
+    r = session.query(Order).filter( Order.id == id ).first()
     session.close()
-    return [ {"order_id":i.id,'order_title':i.title,"user_id":i.userid,"create_date":i.create_date,"update_date":i.update_date} for i in r]
+    return {"data":
+                {"order_id":r.id,'order_title':r.title,"user_id":r.userid,"create_date":r.create_date,"update_date":r.update_date}
+            }
 
 @route.delete('/',response_model=OrderResponse)
 def orders(session=Depends(get_session)):
@@ -44,8 +53,7 @@ def orders(order:OrderRequest,session=Depends(get_session)):
 
 @route.put('/{id}',response_model=OrderResponse)
 def orders(order:OrderRequest,id:int,session=Depends(get_session)):
-    session.query( Order ).filter( Order.id == id ).update( order.model_dump(exclude_unset=True) )
+    r = session.query( Order ).filter( Order.id == id ).update( order.model_dump(exclude_unset=True) )
     session.commit()
-    res = session.query(Order).filter(Order.id == id).first()
     session.close()
-    return res
+    return OrderResponse(status_code='200',detail='ok',total=r)

@@ -2,9 +2,9 @@ from fastapi import FastAPI,Request
 from fastapi.middleware.cors import CORSMiddleware
 
 from starlette.staticfiles import StaticFiles
-from router.features import form, method, file, validation, mimetype, path_query_variables, json
+from router.features import form, method, file, validation, mimetype, path_query_variables, json,session_async
 
-from router.dbopt import mysql,order_route
+from router.dbopt import mysql,order_route,order_select_rep_query
 
 from router.workhome import wk_0915,wk_0916,wk_0917
 
@@ -25,9 +25,13 @@ app.include_router(form.route)
 app.include_router(file.route)
 app.include_router(json.route)
 
+app.include_router(session_async.route)
+
 
 app.include_router(mysql.route)
 app.include_router(order_route.route)
+app.include_router(order_select_rep_query.route)
+
 
 # homeworks...
 app.include_router(wk_0915.route)
@@ -53,8 +57,8 @@ app.add_middleware(
 )
 
 from middle import middles
-app.middleware("http")(middles.black)
-app.middleware("http")(middles.time_)
+# app.middleware("http")(middles.black)
+# app.middleware("http")(middles.time_)
 # black_list = ['192.168.1.40','192.168.1.94'] # '127.0.0.1'，'192.168.1.26‘
 # @app.middleware("http",)
 # async def middleware(req:Request, next):

@@ -1,3 +1,6 @@
+'''
+pymysql 更底层封装sql - 游标
+'''
 import pymysql.cursors
 
 # Connect to the database

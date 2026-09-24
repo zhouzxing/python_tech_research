@@ -9,13 +9,30 @@ from model.order import OrderRequest,Order,get_session,OrderResponse
 
 from dao.order_dao import get_order
 
-route = APIRouter(prefix="/order",tags=["order"])
+route = APIRouter(prefix="/order_select_query",tags=["order_select_query"])
 
 # 模糊查询
-@route.get('/',response_model=OrderResponse)
+@route.get('/query',response_model=OrderResponse)
 def orders(id:int=None, user_id:int=None, title:str=None,session=Depends(get_session)):
+    q = session.query(Order)
+    if id: q = q.filter(Order.id == id)
+    if user_id: q = q.filter(Order.userid == user_id)
+    if title: q = q.where(Order.title.like('%' + title + '%'))
+    res = q.all()
+    return {"data": [{"order_id": r.id, 'order_title': r.title, "user_id": r.userid, "create_date": r.create_date,
+                      "update_date": r.update_date} for r in res]}
 
-    return get_order(id,user_id,title,session)
+@route.get('/select', response_model=OrderResponse)
+def orders(id: int = None, user_id: int = None, title: str = None, session=Depends(get_session)):
+    s = select(Order)
+    if id: s = s.filter(Order.id == id)
+    if user_id: s = s.filter(Order.userid == user_id)
+    if title: s = s.where(Order.title.like('%' + title + '%'))
+
+    res = session.execute(s)
+    return {"data": [{"order_id": r.id, 'order_title': r.title, "user_id": r.userid, "create_date": r.create_date,
+                      "update_date": r.update_date} for r in res]}
+
 
 # todo 请求响应模型序列化Order类问题
 @route.get('/no_response_model')

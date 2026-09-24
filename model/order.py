@@ -2,28 +2,28 @@ from pydantic import BaseModel
 from sqlalchemy.orm import declarative_base,sessionmaker,Session
 from sqlalchemy import Column, Integer,String,DATETIME,create_engine
 from datetime import datetime
-
-db_url = "mysql+pymysql://geeker:geeker@127.0.0.1:3306/fastapi_tutor?charset=utf8mb4"
-engine = create_engine(db_url)
-
-
-def get_session():
-    # Session = sessionmaker(bind=engine
-    #                        , autoflush=False
-    #                        , autocommit=False
-    #                        )
-
-    # session = Session(engine)
-    # try:
-    #     yield session
-    # finally:
-    #     session.close()
-
-    with Session()  as session:
-        yield session
-
-    # with Session(engine)  as session:
-    #     yield session
+#
+# db_url = "mysql+pymysql://geeker:geeker@127.0.0.1:3306/fastapi_tutor?charset=utf8mb4"
+# engine = create_engine(db_url)
+#
+#
+# def get_session():
+#     # Session = sessionmaker(bind=engine
+#     #                        , autoflush=False
+#     #                        , autocommit=False
+#     #                        )
+#
+#     # session = Session(engine)
+#     # try:
+#     #     yield session
+#     # finally:
+#     #     session.close()
+#
+#     with Session()  as session:
+#         yield session
+#
+#     # with Session(engine)  as session:
+#     #     yield session
 
 Base = declarative_base()  # 执行函数，返回一个基类
 

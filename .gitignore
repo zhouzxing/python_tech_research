@@ -10,8 +10,9 @@ tests/
 .github/
 *.md
 !README.md
-.env
-.env.*
+
+!.env.example
+.env/.*
 Dockerfile
 
 __pycache__
